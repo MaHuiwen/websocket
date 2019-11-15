@@ -1,0 +1,18 @@
+spring:
+  rabbitmq:
+    host: 127.0.0.1
+    username: admin
+    password: admin
+    virtual-host: /
+    publisher-returns: true  #确认消息是否正确到达queue
+    template:
+      mandatory: true #投递失败强制将消息返回给生产者，下次重连，会把消费失败数据重新置为ready
+    cache:
+      channel:
+        size: 10
+    listener:
+      simple:
+        acknowledge-mode: manual
+        concurrency: 5
+        max-concurrency: 5
+        prefetch: 1
