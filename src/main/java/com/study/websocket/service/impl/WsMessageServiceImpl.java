@@ -4,8 +4,8 @@ import com.study.websocket.rabbitmq.producer.WsMessageProducer;
 import com.study.websocket.service.WsMessageService;
 import com.study.websocket.service.WsRedisService;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -24,6 +24,11 @@ public class WsMessageServiceImpl implements WsMessageService {
     @Override
     public void sendMessageToMQ(String sid, String message) {
         String port = wsRedisService.getServerInfoBySid(sid);
-        wsMessageProducer.sendToQueue(port, sid, message);
+        if (StringUtils.isNotBlank(port)) {
+            wsMessageProducer.sendToQueue(port, sid, message);
+        } else {
+            log.info("未能获取到用户【{}】连接的端口号", sid);
+        }
+
     }
 }

@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping(value = "/test")
 public class TestController {
 
-    @Value("${mq.queue.ws}")
+    @Value("${mq.queue.ws.message}")
     public String queueName;
     @Value("${server.port}")
     public String port;

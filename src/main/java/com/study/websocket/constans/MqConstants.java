@@ -18,4 +18,8 @@ public class MqConstants {
     /** websocket消息推送交换器名称、队列名称前缀*/
     public static final String EXCHANGE_WS_MESSAGE = "exchange.ws.message";
     public static final String QUEUE_WS_MESSAGE = "queue.ws.message." + ServerUtils.getServerPort();
+
+    /** websocket被挤下线消息队列、交换器名称*/
+    public static final String EXCHANGE_WS_CLOSE = "exchange.ws.close";
+    public static final String QUEUE_WS_CLOSE_PREFIX = "queue.ws.message.";
 }

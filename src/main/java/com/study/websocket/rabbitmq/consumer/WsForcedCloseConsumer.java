@@ -13,7 +13,7 @@ import org.springframework.stereotype.Component;
 import java.io.IOException;
 
 /**
- * websocket消息推送消费者
+ * websocket关闭连接通知推送消费者
  *
  * @author mhw
  * @version v1.0
@@ -21,22 +21,21 @@ import java.io.IOException;
  */
 @Slf4j
 @Component
-public class WsMessageConsumer {
+public class WsForcedCloseConsumer {
 
     private final WebsocketServer websocketServer;
 
     @Autowired
-    public WsMessageConsumer(WebsocketServer websocketServer) {
+    public WsForcedCloseConsumer(WebsocketServer websocketServer) {
         this.websocketServer = websocketServer;
     }
 
-
-    @RabbitListener(queues = "${mq.queue.ws.message}")
+    @RabbitListener(queues = "${mq.queue.ws.close}")
     public void testConsume(String json, Message message, Channel channel) {
         try {
-            log.info("ws消息推送，消费端测试，数据：【{}】", json);
+            log.info("ws强制关闭，消费端测试，数据：【{}】", json);
             WsMessageDTO wsMessageDTO = JSON.parseObject(json, WsMessageDTO.class);
-            websocketServer.sendMessage(wsMessageDTO.getSid(), wsMessageDTO.getMsg());
+            websocketServer.beForcedClose(wsMessageDTO.getSid());
         } finally {
             try {
                 channel.basicAck(message.getMessageProperties().getDeliveryTag(), false);
@@ -45,5 +44,4 @@ public class WsMessageConsumer {
             }
         }
     }
-
 }

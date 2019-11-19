@@ -6,4 +6,6 @@ spring:
 
 mq:
   queue:
-    ws: QUEUE.WS.MESSAGE.${server.port}
+    ws:
+      message: QUEUE.WS.MESSAGE.${server.port}
+      close: QUEUE.WS.CLOSE.${server.port}
