@@ -1,7 +1,13 @@
 package com.study.websocket.websocket;
 
+import com.study.websocket.constans.SystemConstants;
+import com.study.websocket.service.WsRedisService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.core.RedisKeyValueTemplate;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
 import javax.websocket.*;
@@ -16,14 +22,31 @@ import java.util.concurrent.CopyOnWriteArraySet;
 @Component
 @Slf4j
 public class WebsocketServer {
+
+    private final WsRedisService wsRedisService;
+
+
     // 在线人数
     private static int onlineCount = 0;
-
     // session map, key为sid
     private static ConcurrentHashMap<String, Session> sessionMap = new ConcurrentHashMap<>();
 
+
+
+    @Autowired
+    public WebsocketServer(WsRedisService wsRedisService) {
+        this.wsRedisService = wsRedisService;
+    }
+
     @OnOpen
     public void onOpen(Session session, @PathParam("sid") String sid) {
+        if (StringUtils.isBlank(sid)) {
+            log.info("sid为空，不建立连接");
+            return;
+        }
+
+        wsRedisService.saveServerInfo(sid);
+
         log.info("用户【{}】建立连接", sid);
         addOnlineCount();
         sessionMap.put(sid, session);
