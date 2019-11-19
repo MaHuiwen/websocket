@@ -1,41 +1,32 @@
 package com.study.websocket.websocket;
 
-import com.study.websocket.constans.SystemConstants;
 import com.study.websocket.service.WsRedisService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.redis.core.RedisKeyValueTemplate;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
 import javax.websocket.*;
 import javax.websocket.server.PathParam;
 import javax.websocket.server.ServerEndpoint;
-import java.io.EOFException;
 import java.io.IOException;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.CopyOnWriteArraySet;
 
 @ServerEndpoint("/websocket/{sid}")
 @Component
 @Slf4j
 public class WebsocketServer {
 
-    private final WsRedisService wsRedisService;
-
+    private static WsRedisService wsRedisService;
 
     // 在线人数
     private static int onlineCount = 0;
     // session map, key为sid
     private static ConcurrentHashMap<String, Session> sessionMap = new ConcurrentHashMap<>();
 
-
-
     @Autowired
-    public WebsocketServer(WsRedisService wsRedisService) {
-        this.wsRedisService = wsRedisService;
+    public void setWsRedisService(WsRedisService wsRedisService) {
+        WebsocketServer.wsRedisService = wsRedisService;
     }
 
     @OnOpen
@@ -45,13 +36,12 @@ public class WebsocketServer {
             return;
         }
 
-        wsRedisService.saveServerInfo(sid);
-
         log.info("用户【{}】建立连接", sid);
+        wsRedisService.saveServerInfo(sid);
         addOnlineCount();
         sessionMap.put(sid, session);
         try {
-            sendMessage(session, "连接成功");
+            this.sendMessage(session, "连接成功");
         } catch (Exception e) {
             log.error("websocket IO异常");
         }
@@ -60,6 +50,7 @@ public class WebsocketServer {
     @OnClose
     public void onClose(Session session, @PathParam("sid") String sid) {
         log.info("用户【{}】关闭连接", sid);
+        wsRedisService.deleteServerInfo(sid);
         subOnlineCount();
         sessionMap.remove(sid);
     }
@@ -79,7 +70,7 @@ public class WebsocketServer {
     public void sendMessage(String sid, String message) {
         Session session = sessionMap.get(sid);
         if (session == null) {
-            log.info("用户【{}】不在线", sid);
+            log.info("用户【{}】不在此服务上", sid);
             return;
         }
         this.sendMessage(session, message);

@@ -1,5 +1,7 @@
 package com.study.websocket.rabbitmq.producer;
 
+import com.alibaba.fastjson.JSON;
+import com.study.websocket.bean.WsMessageDTO;
 import com.study.websocket.constans.MqConstants;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -24,8 +26,9 @@ public class WsMessageProducer {
         this.rabbitTemplate = rabbitTemplate;
     }
 
-    public void sendToQueue(String routingKey, String msgJSON) {
-        log.info("路由【{}】发送消息：【{}】", routingKey, msgJSON);
-        rabbitTemplate.convertAndSend(MqConstants.EXCHANGE_WS_MESSAGE, routingKey, msgJSON);
+    public void sendToQueue(String routingKey, String sid, String msgJSON) {
+        log.info("路由【{}】给用户【{}】发送消息：【{}】", routingKey, sid, msgJSON);
+        WsMessageDTO wsMessageDTO = new WsMessageDTO(sid, msgJSON);
+        rabbitTemplate.convertAndSend(MqConstants.EXCHANGE_WS_MESSAGE, routingKey, JSON.toJSONString(wsMessageDTO));
     }
 }

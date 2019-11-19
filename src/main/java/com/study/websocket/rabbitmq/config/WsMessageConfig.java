@@ -12,6 +12,8 @@ public class WsMessageConfig {
 
     @Value("${mq.queue.ws}")
     public String queueName;
+    @Value("${server.port}")
+    private String port;
 
     @Bean
     public DirectExchange wsMessageExchange() {
@@ -29,6 +31,6 @@ public class WsMessageConfig {
         return BindingBuilder
                 .bind(wsMessageQueue())
                 .to(wsMessageExchange())
-                .with(ServerUtils.getServerPort());
+                .with(port);
     }
 }

@@ -1,15 +1,13 @@
 package com.study.websocket.rabbitmq.consumer;
 
+import com.alibaba.fastjson.JSON;
 import com.rabbitmq.client.Channel;
-import com.study.websocket.constans.MqConstants;
-import com.study.websocket.constans.SystemConstants;
-import com.study.websocket.utils.ServerUtils;
+import com.study.websocket.bean.WsMessageDTO;
+import com.study.websocket.websocket.WebsocketServer;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.core.Message;
-import org.springframework.amqp.rabbit.annotation.Exchange;
-import org.springframework.amqp.rabbit.annotation.Queue;
-import org.springframework.amqp.rabbit.annotation.QueueBinding;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
@@ -25,10 +23,20 @@ import java.io.IOException;
 @Component
 public class WsMessageConsumer {
 
+    private final WebsocketServer websocketServer;
+
+    @Autowired
+    public WsMessageConsumer(WebsocketServer websocketServer) {
+        this.websocketServer = websocketServer;
+    }
+
+
     @RabbitListener(queues = "${mq.queue.ws}")
     public void testConsume(String json, Message message, Channel channel) {
         try {
             log.info("ws消息推送，消费端测试，数据：【{}】", json);
+            WsMessageDTO wsMessageDTO = JSON.parseObject(json, WsMessageDTO.class);
+            websocketServer.sendMessage(wsMessageDTO.getSid(), wsMessageDTO.getMsg());
         } finally {
             try {
                 channel.basicAck(message.getMessageProperties().getDeliveryTag(), false);

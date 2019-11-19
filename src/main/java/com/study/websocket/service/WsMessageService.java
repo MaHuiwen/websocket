@@ -15,5 +15,5 @@ public interface WsMessageService {
      * @param
      * @return
      */
-    void sendMessage(String sid, String message);
+    void sendMessageToMQ(String sid, String message);
 }

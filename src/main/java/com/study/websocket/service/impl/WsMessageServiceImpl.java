@@ -22,8 +22,8 @@ public class WsMessageServiceImpl implements WsMessageService {
     }
 
     @Override
-    public void sendMessage(String sid, String message) {
+    public void sendMessageToMQ(String sid, String message) {
         String port = wsRedisService.getServerInfoBySid(sid);
-        wsMessageProducer.sendToQueue(port, message);
+        wsMessageProducer.sendToQueue(port, sid, message);
     }
 }

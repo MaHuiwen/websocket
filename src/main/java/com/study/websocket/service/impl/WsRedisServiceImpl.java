@@ -14,9 +14,10 @@ import org.springframework.stereotype.Service;
 @Slf4j
 public class WsRedisServiceImpl implements WsRedisService {
 
+    @Value("${server.port}")
+    private String port;
+
     private final RedisTemplate<String, String> redisTemplate;
-
-
 
     @Autowired
     public WsRedisServiceImpl(RedisTemplate<String, String> redisTemplate) {
@@ -25,7 +26,6 @@ public class WsRedisServiceImpl implements WsRedisService {
 
     @Override
     public void saveServerInfo(String sid) {
-        String port = ServerUtils.getServerPort();
         log.info("用户【{}】的端口为【{}】", sid, port);
         // todo:是否应该id+port组成一个key
         HashOperations<String, String, String> hashOperations = redisTemplate.opsForHash();

@@ -46,7 +46,7 @@ public class TestController {
     @PostMapping(value = "/mq/consumer")
     public Object sendWebsocketMessage(@RequestBody SendMessageDTO dto) {
         log.info("发送ws消息，接收参数：{}", JSON.toJSON(dto));
-        wsMessageProducer.sendToQueue(port, JSON.toJSONString(dto));
+        wsMessageProducer.sendToQueue(port, dto.getSid(), dto.getMessage());
         return "success";
     }
 
